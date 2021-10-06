@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
 //use Illuminate\Support\Facades\Date;
 
 class TodoController extends Controller
@@ -15,14 +17,14 @@ class TodoController extends Controller
      */
     public function index()
     {
-        $todos_to_be_done = Todo::where('completed', false)->get(); //list/collection
+        $todos_to_be_done = auth()->user()->todos_assigned()->where('completed', false)->get();
         $completed_count = Todo::where('completed', true)->count(); //int
         $expired_count = Todo::where('expiration_date', '<', now())->count(); //int
 
         return view('todos.index', [
             'todos' => $todos_to_be_done, 
             'completed_count' => $completed_count,
-            'expired_count' => $expired_count
+            'expired_count' => $expired_count,
         ]);
     }
 
@@ -44,14 +46,21 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        $todo = Todo::create($request->all());
+        //$todo = Todo::create($request->all());
 
-        // $todo = Todo::create([
-        //     'name' => $request->name,
-        //     'description' => $request->description,   
-        //     'completed' => true
-        // ]);
-
+        Validator::make($request->all(), [
+            'name' => 'required|alpha|max:255',
+            'description' => 'nullable',
+        ])->validate();
+        
+        
+        $todo = Todo::create([
+            'name' => $request->name,
+            'description' => $request->description,   
+            //'completed' => false, //default false in sql
+            'user_id' => $request->user()->id, //or auth()->user()->id
+        ]);
+        $todo->assigned_users()->attach($request->user()->id);
         return back()->with('message', __('todo.created'));
                                     //a toast message will appear, see layouts.app.blade
     }
@@ -75,8 +84,14 @@ class TodoController extends Controller
 
         //query builder: ->get()-nel keri le az adatbazisbol
         //a get kivalthato pl. first-tel
+        $completed_count = Todo::where('completed', true)->count(); //int
+        $expired_count = Todo::where('expiration_date', '<', now())->count(); //int
 
-        return view('todos.index', ['todos' => [$todo]]);
+        return view('todos.index', [
+            'todos' => [$todo], 
+            'completed_count' => $completed_count,
+            'expired_count' => $expired_count
+        ]);
 
     }
 
@@ -106,7 +121,15 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
-        //
+        $this->authorize('update', $todo);
+        if($request->has('user_id')){
+            Validator::make($request->all(), [
+                'user_id'=> 'exists:users,id'
+            ])->validate();
+            $todo->assigned_users()->attach($request->user_id);
+        }
+        return back()->with('message', __('todo.updated'));
+
     }
 
     /**

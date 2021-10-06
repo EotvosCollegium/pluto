@@ -39,4 +39,23 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    /**
+     * Get the todos the user created.
+     * See https://laravel.com/docs/8.x/eloquent-relationships#one-to-many
+     */
+    public function todos()
+    {
+        return $this->hasMany(Todo::class);
+    }
+
+    /**
+     * Get the todos the user assigned to.
+     * See https://laravel.com/docs/8.x/eloquent-relationships#many-to-many
+     */
+    public function todos_assigned()
+    {
+        return $this->belongsToMany(Todo::class);
+    }
 }

@@ -27,6 +27,7 @@ class TodoFactory extends Factory
             'description' => $this->faker->paragraph(),
             'expiration_date' => $this->faker->dateTimeBetween('-1 week', '1 week'),
             'completed' => false,
+            'user_id' => User::all()->random()->id,
         ];
     }
 }
