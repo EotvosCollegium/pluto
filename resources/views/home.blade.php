@@ -11,9 +11,9 @@
         </div>
       </div>
     </div>
-<div
+<div>
 <div class="row">
-    <div class="col s8 m6">
+  <div class="col s8 m6">
     <div class="card #ffcc80 orange lighten-3">
         <div class="card-content black-text">
           <span class="card-title">Vicc 1</span>
@@ -46,6 +46,7 @@
       </div>
     </div>
   </div>
+
 
 <div class="row">
     <div class="col s2">

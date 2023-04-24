@@ -38,6 +38,8 @@
       
     <li>
         <ul class="collapsible collapsible-accordion">
+            {{-- Accounts --}}
+            <li><a class="waves-effect" href="{{ route('accounts.index') }}"><i class="material-icons left">account_balance</i>Accounts</a>
             {{-- Todos --}}
             <li><a class="waves-effect" href="{{ route('todos.index') }}"><i class="material-icons left">done</i>@lang('todo.todos')</a>
             <!-- language select -->
